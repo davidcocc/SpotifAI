@@ -46,17 +46,17 @@ def normalizeDataset():
     df.reset_index(inplace=True)
     print("Normalizzo il dataset.")
     df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.fit_transform(df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
-    df.to_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\normalizedMusicData.csv', encoding='utf-8', index=False)
+    df.to_csv('\\normalizedMusicData.csv', encoding='utf-8', index=False)
     print("Dataset normalizzato.")
     return df
 
 def normalizeSong():
     df = pd.read_csv("musicData.csv")
     df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.fit_transform(df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
-    df2 = pd.read_csv("C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\songFeatures.csv")
+    df2 = pd.read_csv("\\songFeatures.csv")
     print("Normalizzo il brano.")
     df2[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.transform(df2[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
-    df2.to_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\normalizedSong.csv', encoding='utf-8', index=False)
+    df2.to_csv('\\normalizedSong.csv', encoding='utf-8', index=False)
     print("Brano normalizzato.")
     return df2
 
