@@ -1,13 +1,18 @@
+import sys
 import spotipy
+import json
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
+import numpy
 import re
 import matplotlib.pyplot as plt
+import csv
+import os
 from spotipy import SpotifyOAuth
 from pprint import pprint
 
-SPOTIPY_CLIENT_ID = 'il_tuo_client_ID'
-SPOTIPY_CLIENT_SECRET = 'il_tuo_codice_segreto'
+SPOTIPY_CLIENT_ID = 'a05452f38db9485088e5744dc2b756e3'
+SPOTIPY_CLIENT_SECRET = '0bf3ed7f0de144ce849350913a88dd65'
 SPOTIPY_REDIRECT_URI = 'http://localhost:8080'
 SCOPE = "user-read-playback-state,user-modify-playback-state,user-library-read,playlist-modify-private,playlist-modify-public"
 CACHE = '.spotipyoauthcache'
@@ -42,26 +47,28 @@ def getPlaylistTracksID(pl_id):
 def normalizeDataset():
     df = pd.read_csv("musicData.csv")
     print("Rimuovo i duplicati.")
+    df = df[(df.Playlist != 'u fucking nerd') & (df.Playlist != 'ðŸ†ðŸ…´ðŸ…°ðŸ…» ðŸ†ƒðŸ†ðŸ…°ðŸ…¿ðŸ…¿ðŸ…¸ðŸ…½') & (df['Artist Name'] != 'Brunori Sas') & (df['Artist Name'] != 'Giovanni Truppi') & (df['Artist Name'] != 'Rosa Chemical') & (df['Artist Name'] != 'Brunori Sas') & (df['Artist Name'] != 'bdrmm') & (df['Artist Name'] != 'Tauro Boys') & (df['Artist Name'] != 'Radical') & (df['Artist Name'] != 'cmqmartina') & (df['Artist Name'] != 'ç‰©èªžã') & (df['Artist Name'] != 'C418') & (df['Artist Name'] != 'ï¼’ï¼˜ï¼‘ï¼\”') & (df['Artist Name'] != 'FSK SATELLITE')]
     df.drop_duplicates('id', inplace=True)
     df.reset_index(inplace=True)
     print("Normalizzo il dataset.")
-    df[['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.fit_transform(df[['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
-    df.to_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script\\normalizedMusicData.csv', encoding='utf-8', index=False)
+    df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.fit_transform(df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
+    df.to_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\normalizedMusicData.csv', encoding='utf-8', index=False)
     print("Dataset normalizzato.")
     return df
 
 def normalizeSong():
     df = pd.read_csv("musicData.csv")
-    df[['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.fit_transform(df[['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
-    df2 = pd.read_csv("C:\\Users\\david\\Desktop\\progettoFIA\\script\\songFeatures.csv")
+    df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.fit_transform(df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
+    df2 = pd.read_csv("C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\songFeatures.csv")
     print("Normalizzo il brano.")
-    df2[['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.transform(df2[['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
-    df2.to_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script\\normalizedSong.csv', encoding='utf-8', index=False)
+    df2[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']] = mms.transform(df2[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']])
+    df2.to_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\normalizedSong.csv', encoding='utf-8', index=False)
     print("Brano normalizzato.")
     return df2
 
 def getPlaylistURI():
     playlistLink = input("Inserisci il link di una playlist Spotify: ")
+
     if match := re.match(r"https://open.spotify.com/playlist/(.*)\?", playlistLink):
         playlist_uri = match.groups()[0]
         return playlist_uri
@@ -77,7 +84,6 @@ def getTrackURI():
     else:
         raise ValueError("Formato: https://open.spotify.com/track/...")
 
-##thanks to Ido Lior (kaggle.com/siropo)
 def createDataset(playlists, sp,k):
     """
     Helper function
@@ -141,8 +147,8 @@ def createDataset(playlists, sp,k):
     return song_list, cols
 
 def getSongsFeaturesDataset():
-    df = pd.read_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script\\normalizedMusicData.csv')
-    features_df = df[['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']]
+    df = pd.read_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\normalizedMusicData.csv')
+    features_df = df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']]
     return features_df
 
 def addCSVtoPlaylist(playlistID, filePath):
@@ -161,8 +167,6 @@ def getPlaylistFeatures(filePath, title):
     print(playlistDF['valence'].mean())
     print("acousticness:")
     print(playlistDF['acousticness'].mean())
-    print("mode:")
-    print(playlistDF['mode'].mean())
     print("speechiness:")
     print(playlistDF['speechiness'].mean())
     print("instrumentalness:")
@@ -171,34 +175,17 @@ def getPlaylistFeatures(filePath, title):
     print(playlistDF['liveness'].mean())
     print("tempo:")
     print(playlistDF['tempo'].mean())
-    fig = plt.figure()
-    ax = fig.add_axes([0,0,1,1])
-    features = ['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']
-    avgs = [playlistDF['danceability'].mean(), playlistDF['energy'].mean(), playlistDF['valence'].mean(), playlistDF['acousticness'].mean(), playlistDF['mode'].mean(), playlistDF['speechiness'].mean(), playlistDF['instrumentalness'].mean(), playlistDF['liveness'].mean(), playlistDF['tempo'].mean()]
-    colors = ['red', 'limegreen', 'fuchsia', 'blue', 'orange', 'green', 'black', 'brown', 'yellow', 'pink']
+    features = ['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']
+    avgs = [playlistDF['danceability'].mean(), playlistDF['energy'].mean(), playlistDF['valence'].mean(), playlistDF['acousticness'].mean(), playlistDF['speechiness'].mean(), playlistDF['instrumentalness'].mean(), playlistDF['liveness'].mean(), playlistDF['tempo'].mean()]
+    colors = ['red', 'limegreen', 'fuchsia', 'blue', 'orange', 'green', 'brown', 'yellow', 'pink']
     plt.bar(features, avgs, color = colors)
     plt.title("Features della " + title)
     plt.show()
 
 def plotSong(song, trackName):
-    type(song)
-    type(trackName)
-    features = ['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo']
-    values = [song['danceability'].mean(), song['energy'].mean(), song['valence'].mean(), song['acousticness'].mean(), song['mode'].mean(), song['speechiness'].mean(), song['instrumentalness'].mean(), song['liveness'].mean(), song['tempo'].mean()]
-    colors = ['red', 'limegreen', 'fuchsia', 'blue', 'orange', 'green', 'black', 'brown', 'yellow', 'pink']
+    features = ['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']
+    values = [song['danceability'].mean(), song['energy'].mean(), song['valence'].mean(), song['acousticness'].mean(), song['speechiness'].mean(), song['instrumentalness'].mean(), song['liveness'].mean(), song['tempo'].mean()]
+    colors = ['red', 'limegreen', 'fuchsia', 'blue', 'orange', 'green', 'brown', 'yellow', 'pink']
     plt.bar(features, values, color = colors)
     plt.title("Features del brano " + trackName)
     plt.show()
-
-def testTrack():
-    track_URI = getTrackURI()
-    track_id = "spotify:track:" + track_URI
-    featureDictionary = sp.audio_features(track_id)
-    trackID = [featureDictionary[0]['id']]
-    track = sp.track(trackID[0])
-    trackName = track["name"]
-    songFeatures = [featureDictionary[0]['danceability'], featureDictionary[0]['energy'], featureDictionary[0]['valence'], featureDictionary[0]['acousticness'], featureDictionary[0]['mode'], featureDictionary[0]['speechiness'], featureDictionary[0]['instrumentalness'], featureDictionary[0]['liveness'], featureDictionary[0]['tempo']]
-    df = pd.DataFrame([songFeatures], columns=['danceability', 'energy', 'valence', 'acousticness', 'mode', 'speechiness', 'instrumentalness', 'liveness', 'tempo'])
-    df.to_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script\\songFeatures.csv', encoding='utf-8', index=False)
-    normalizedSong = normalizeSong()
-    plotSong(normalizedSong, trackName)
