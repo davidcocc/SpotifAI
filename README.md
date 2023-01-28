@@ -8,7 +8,7 @@ Infine, la cartella _etc_, non fondamentale per l'esecuzione, contiene alcuni al
 
 ### Indicazioni sull'uso della libreria Spotipy
 Per sfruttare le funzionalità della libreria Spotipy è necessario creare un account per sviluppatori qui: https://developer.spotify.com. <br>
-PS: Alcune funzionalità potrebbero richiedere un account **premium**
+PS: Alcune funzionalità potrebbero richiedere un account **premium**.
   
 ### Risultati
 Le cinque playlist risultanti dall'applicazione del modello sul mio account Spotify sono presenti ai seguenti link: <br>
