@@ -16,6 +16,14 @@ SCOPE = "user-read-playback-state,user-modify-playback-state,ugc-image-upload,pl
 CACHE = '.spotipyoauthcache'
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id = SPOTIPY_CLIENT_ID, client_secret = SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope=SCOPE, requests_timeout=10))
 
+##Uso k.means++, così da fissare i centroidi e realizzare dunque le playlist con ordine definitivo.
+init = np.array([[0.69067499, 0.42461208],
+                     [-0.34262122, 0.11928248],
+                     [0.62527308, -0.29335611],
+                     [-0.29001734, 0.66657766],
+                     [-0.3808871, -0.30502303]],
+                    np.float64)
+
 ##genero un file .csv a partire da brani presenti nel mio Spotify personale. Il risultato è il file musicData.csv, contenente circa 2000 brani diversi e variegati. (richiede un po' di tempo!)
 playlists = sp.current_user_playlists()
 print(type(playlists))
@@ -88,7 +96,7 @@ features_df = getSongsFeaturesDataset()
 
 ##visualizzazione dell'elbow point per il riconoscimento del numero adatto di cluster.
 curva = []
-K = range(2,15)
+K = range(2,10)
 for k in K:
     kmeanModel = KMeans(n_clusters=k)
     kmeanModel.fit(features_df)
@@ -96,8 +104,8 @@ for k in K:
 
 plt.figure(figsize=(16,8))
 plt.plot(K, curva, 'bx-', marker = 'o')
-plt.xlabel('k')
-plt.ylabel('Inerzia')
+plt.xlabel('Numero di Cluster (k)')
+plt.ylabel('SSE')
 plt.title('Il metodo Elbow Point mostra il k ottimale per il clustering.')
 plt.show()
 
@@ -106,7 +114,7 @@ pca = PCA(2)
 df_train = pca.fit_transform(features_df)
 
 ##applicazione del kMeans.
-kmeans = KMeans(5, max_iter=100)
+kmeans = KMeans(5, init=init, max_iter=100)
 assigned_clusters = kmeans.fit_predict(df_train) ##fase di training
 print("Cluster creati")
 print(assigned_clusters)
@@ -147,28 +155,28 @@ sp.user_playlist_create(user["id"], "SpotifAI: Cluster #2", public=True, collabo
 sp.user_playlist_create(user["id"], "SpotifAI: Cluster #3", public=True, collaborative=False, description='')
 sp.user_playlist_create(user["id"], "SpotifAI: Cluster #4", public=True, collaborative=False, description='')
 sp.user_playlist_create(user["id"], "SpotifAI: Cluster #5", public=True, collaborative=False, description='')
-sp.user_playlist_create(user["id"], "SpotifAI: Cluster #6", public=True, collaborative=False, description='')
-addCSVtoPlaylist("7v1DjIyITQpizvfjMNngV1", 'C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_0.csv')
-addCSVtoPlaylist("219rfI6t7YTuWbXB3lsQxx", 'C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_1.csv')
-addCSVtoPlaylist("4FIfBho4ftbwf2OAVBNDTy", 'C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_2.csv')
-addCSVtoPlaylist("2O3kfZStAroOaFJtl8go9n", 'C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_3.csv')
-addCSVtoPlaylist("6ZvSXFhiCE1jXi0AUqgvQ8", 'C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_4.csv')
+##è possibile anche ottenere direttamente l'URI delle playlist appena create.
+addCSVtoPlaylist("your-playlist1-uri", '\\kmeans\\kmeans_cluster_0.csv')
+addCSVtoPlaylist("your-playlist2-uri", '\\kmeans\\kmeans_cluster_1.csv')
+addCSVtoPlaylist("your-playlist3-uri", '\\kmeans\\kmeans_cluster_2.csv')
+addCSVtoPlaylist("your-playlist4-uri", '\\kmeans\\kmeans_cluster_3.csv')
+addCSVtoPlaylist("your-playlist5-uri", '\\kmeans\\kmeans_cluster_4.csv')
 
 ##stampa delle features (e dei grafici) delle diverse playlist
 print("Features della playlist #1:")
-getPlaylistFeatures('C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_0.csv', "Playlist #1")
+getPlaylistFeatures('\\kmeans\\kmeans_cluster_0.csv', "Playlist #1")
 print("Features della playlist #2:")
-getPlaylistFeatures('C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_1.csv', "Playlist #2")
+getPlaylistFeatures('\\kmeans\\kmeans_cluster_1.csv', "Playlist #2")
 print("Features della playlist #3:")
-getPlaylistFeatures('C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_2.csv', "Playlist #3")
+getPlaylistFeatures('\\kmeans\\kmeans_cluster_2.csv', "Playlist #3")
 print("Features della playlist #4:")
-getPlaylistFeatures('C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_3.csv', "Playlist #4")
+getPlaylistFeatures('\\kmeans\\kmeans_cluster_3.csv', "Playlist #4")
 print("Features della playlist #5: ")
-getPlaylistFeatures('C:\\Users\\david\\Desktop\\progettoFIA\\script\\kmeans\\kmeans_cluster_4.csv', "Playlist #5")
+getPlaylistFeatures('\\kmeans\\kmeans_cluster_4.csv', "Playlist #5")
 
 ##predizione e aggiunta di un brano a una playlist, con plot del grafico delle features.
 testTrack()
-song_df = pd.read_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script\\normalizedSong.csv')
+song_df = pd.read_csv('\\normalizedSong.csv')
 df_test = pca.transform(song_df)
 pred = kmeans.predict(df_test)
 
