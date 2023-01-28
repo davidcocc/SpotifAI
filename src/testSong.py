@@ -1,20 +1,17 @@
 import spotipy
 from spotipy import SpotifyOAuth
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from matplotlib import pyplot as plt
-from utils import normalizeDataset, getSongsFeaturesDataset, addCSVtoPlaylist, getPlaylistFeatures, getTrackURI, normalizeSong, plotSong
+from utils import getTrackURI, normalizeSong, plotSong
 import numpy as np
 import pandas as pd
 
-SPOTIPY_CLIENT_ID = 'a05452f38db9485088e5744dc2b756e3'
-SPOTIPY_CLIENT_SECRET = '0bf3ed7f0de144ce849350913a88dd65'
+SPOTIPY_CLIENT_ID = 'il_tuo_client_ID'
+SPOTIPY_CLIENT_SECRET = 'il_tuo_codice_segreto'
 SPOTIPY_REDIRECT_URI = 'http://localhost:8080'
 SCOPE = "user-read-playback-state,user-modify-playback-state,ugc-image-upload,playlist-modify-private,playlist-modify-public"
 CACHE = '.spotipyoauthcache'
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id = SPOTIPY_CLIENT_ID, client_secret = SPOTIPY_CLIENT_SECRET, redirect_uri=SPOTIPY_REDIRECT_URI, scope=SCOPE, requests_timeout=10))
 
-##Stampa delle features di un brano
+##Stampa e plot delle features di un brano
 def testTrack():
     track_URI = getTrackURI()
     track_id = "spotify:track:" + track_URI

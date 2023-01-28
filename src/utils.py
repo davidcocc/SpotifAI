@@ -1,18 +1,13 @@
-import sys
 import spotipy
-import json
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
-import numpy
 import re
 import matplotlib.pyplot as plt
-import csv
-import os
 from spotipy import SpotifyOAuth
 from pprint import pprint
 
-SPOTIPY_CLIENT_ID = 'a05452f38db9485088e5744dc2b756e3'
-SPOTIPY_CLIENT_SECRET = '0bf3ed7f0de144ce849350913a88dd65'
+SPOTIPY_CLIENT_ID = 'your-secret-id'
+SPOTIPY_CLIENT_SECRET = 'your-secret-client'
 SPOTIPY_REDIRECT_URI = 'http://localhost:8080'
 SCOPE = "user-read-playback-state,user-modify-playback-state,user-library-read,playlist-modify-private,playlist-modify-public"
 CACHE = '.spotipyoauthcache'
@@ -47,7 +42,6 @@ def getPlaylistTracksID(pl_id):
 def normalizeDataset():
     df = pd.read_csv("musicData.csv")
     print("Rimuovo i duplicati.")
-    df = df[(df.Playlist != 'u fucking nerd') & (df.Playlist != 'ðŸ†ðŸ…´ðŸ…°ðŸ…» ðŸ†ƒðŸ†ðŸ…°ðŸ…¿ðŸ…¿ðŸ…¸ðŸ…½') & (df['Artist Name'] != 'Brunori Sas') & (df['Artist Name'] != 'Giovanni Truppi') & (df['Artist Name'] != 'Rosa Chemical') & (df['Artist Name'] != 'Brunori Sas') & (df['Artist Name'] != 'bdrmm') & (df['Artist Name'] != 'Tauro Boys') & (df['Artist Name'] != 'Radical') & (df['Artist Name'] != 'cmqmartina') & (df['Artist Name'] != 'ç‰©èªžã') & (df['Artist Name'] != 'C418') & (df['Artist Name'] != 'ï¼’ï¼˜ï¼‘ï¼\”') & (df['Artist Name'] != 'FSK SATELLITE')]
     df.drop_duplicates('id', inplace=True)
     df.reset_index(inplace=True)
     print("Normalizzo il dataset.")
@@ -86,6 +80,7 @@ def getTrackURI():
 
 def createDataset(playlists, sp,k):
     """
+    Thanks to @IdoLior (kaggle.com)
     Helper function
     :param playlists- playlists to draw tracks from
     :param sp - spotipy object to manage stuff
@@ -147,7 +142,7 @@ def createDataset(playlists, sp,k):
     return song_list, cols
 
 def getSongsFeaturesDataset():
-    df = pd.read_csv('C:\\Users\\david\\Desktop\\progettoFIA\\script_noMode\\normalizedMusicData.csv')
+    df = pd.read_csv('\\normalizedMusicData.csv')
     features_df = df[['danceability', 'energy', 'valence', 'acousticness', 'speechiness', 'instrumentalness', 'liveness', 'tempo']]
     return features_df
 
