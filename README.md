@@ -11,7 +11,7 @@ Per sfruttare le funzionalità della libreria Spotipy è necessario creare un ac
 PS: Alcune funzionalità potrebbero richiedere un account **premium**.
   
 ### Risultati
-Le cinque playlist risultanti dall'applicazione del modello sul mio account Spotify sono presenti ai seguenti link: <br>
+Le cinque playlist risultanti dall'applicazione del modello sul mio account Spotify possono essere ascoltate ai seguenti link: <br>
   Playlist #1: https://open.spotify.com/playlist/1zZwkRtP2BXZkfAWjPZpYb?si=4e1f4a2b5ad341ff <br>
   Playlist #2: https://open.spotify.com/playlist/2GZYUSDy0Q9ArGAlAVRhZo?si=fde1976d039743ed <br>
   Playlist #3: https://open.spotify.com/playlist/0kieusxTwjv3XpBiwVA0JY?si=c8e9e368f7aa41d9 <br>
